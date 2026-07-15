@@ -3,31 +3,38 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Oko pro marcipán</title>
+<title>Oční a barevné testy</title>
 <style>
 :root{
   --bg:#f4f6f8;--card:#fff;--text:#17212b;--muted:#637080;--accent:#2457d6;
-  --ok:#16794a;--bad:#b42318;--border:#d8dee6;--soft:#e9edf4;
+  --ok:#16794a;--bad:#b42318;--border:#d8dee6;--soft:#e9edf4;--sidebar:#101826;
 }
 *{box-sizing:border-box}
+html{scroll-behavior:smooth}
 body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--text)}
-main{max-width:1000px;margin:auto;padding:24px}
+button,input,select{font:inherit}
+button{border:0;border-radius:10px;padding:10px 15px;background:var(--accent);color:#fff;cursor:pointer}
+button.secondary,.choice{background:var(--soft);color:var(--text)}
+button.active,.choice.active{outline:3px solid rgba(36,87,214,.25);background:var(--accent);color:#fff}
+button:disabled{opacity:.5;cursor:not-allowed}
+.app{display:grid;grid-template-columns:260px minmax(0,1fr);min-height:100vh}
+.sidebar{background:var(--sidebar);color:#fff;padding:22px 16px;position:sticky;top:0;height:100vh;overflow:auto}
+.sidebar h2{font-size:1.15rem;margin:0 8px 18px}
+.nav{display:flex;flex-direction:column;gap:7px}
+.nav button{text-align:left;background:transparent;color:#dce5f2;border:1px solid transparent}
+.nav button:hover,.nav button.active{background:#20314d;border-color:#38527d;color:#fff;outline:none}
+.content{min-width:0}
+main{max-width:1050px;margin:auto;padding:24px}
 h1{font-size:clamp(1.65rem,4vw,2.45rem);margin-bottom:8px}
 h2{margin-top:0}
 p{line-height:1.55}
 .card,.notice{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px;margin:16px 0;box-shadow:0 4px 16px rgba(0,0,0,.04)}
 .notice{border-left:5px solid #d49a00}
-.tabs,.controls,.mode-switch,.difficulty{display:flex;flex-wrap:wrap;gap:8px}
-.tabs{margin:22px 0}
-button,input{font:inherit}
-button{border:0;border-radius:10px;padding:10px 15px;background:var(--accent);color:#fff;cursor:pointer}
-button.secondary,.choice{background:var(--soft);color:var(--text)}
-button.active,.choice.active{outline:3px solid rgba(36,87,214,.25);background:var(--accent);color:#fff}
-button:disabled{opacity:.5;cursor:not-allowed}
 .test{display:none}.test.active{display:block}
-canvas{display:block;max-width:100%;height:auto;margin:10px auto;border-radius:50%;background:#eee}
-.answers{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
-.answers button{min-width:58px}
+.controls,.mode-switch,.difficulty,.answers{display:flex;flex-wrap:wrap;gap:8px}
+.mode-switch,.difficulty,.answers{justify-content:center}
+canvas{display:block;max-width:100%;height:auto;margin:12px auto;background:#fff}
+#plate{border-radius:50%;background:#eee}
 .status{text-align:center;font-weight:700;min-height:30px;margin-top:10px}
 .progress{font-size:.92rem;color:var(--muted);margin-bottom:10px}
 .sortable{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;min-height:88px;padding:12px;border:2px dashed var(--border);border-radius:12px;margin:14px 0}
@@ -35,46 +42,90 @@ canvas{display:block;max-width:100%;height:auto;margin:10px auto;border-radius:5
 .tile.dragging{opacity:.4}
 .grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;max-width:580px;margin:16px auto}
 .swatch{aspect-ratio:1;border:2px solid rgba(0,0,0,.22);border-radius:12px;cursor:pointer;padding:0}
-.mode-switch{justify-content:center;margin:10px 0}
 .text-answer{display:none;justify-content:center;gap:8px;align-items:center;flex-wrap:wrap}
 .text-answer.active{display:flex}
 .text-answer input{width:180px;padding:10px 12px;border:1px solid var(--border);border-radius:10px}
-.difficulty{justify-content:center;margin:14px 0}
 .difficulty button{padding:7px 10px;min-width:42px;font-size:.9rem}
 small{color:var(--muted)}
 .hint{font-weight:800;font-size:1.15rem;background:rgba(255,255,255,.72);border-radius:999px;min-width:30px;padding:3px 7px}
 .hidden{display:none!important}
-@media(max-width:600px){main{padding:14px}.tile{width:54px;height:54px}.grid{gap:7px}}
+.center{text-align:center}
+.eye-board{display:flex;align-items:center;justify-content:center;min-height:330px;background:#fff;border:1px solid var(--border);border-radius:14px;margin:14px 0}
+.landolt{font-size:180px;line-height:1;font-family:Arial,sans-serif;display:inline-block}
+.contrast-box{display:flex;align-items:center;justify-content:center;min-height:300px;border:1px solid var(--border);border-radius:14px;background:#fff}
+.peripheral-area{position:relative;height:430px;border:1px solid var(--border);border-radius:14px;background:#fff;overflow:hidden}
+.fixation{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:30px;font-weight:800}
+.flash-dot{position:absolute;width:28px;height:28px;border-radius:50%;background:#111;display:none}
+.amsler{display:grid;grid-template-columns:repeat(20,1fr);max-width:520px;aspect-ratio:1;margin:14px auto;border:2px solid #111}
+.amsler button{border-radius:0;border:1px solid #aaa;background:#fff;padding:0}
+.amsler button.marked{background:#ffb4b4}
+.color-reference{width:170px;height:170px;border-radius:18px;border:2px solid rgba(0,0,0,.2);margin:12px auto}
+.match-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;max-width:560px;margin:14px auto}
+.match-grid button{aspect-ratio:1;border:2px solid rgba(0,0,0,.25);padding:0}
+.blindspot-wrap{display:flex;align-items:center;justify-content:center;gap:180px;min-height:260px;background:#fff;border:1px solid var(--border);border-radius:14px;font-size:54px;font-weight:800}
+.d15-anchor{display:flex;justify-content:center;margin-bottom:10px}
+.d15-anchor div{width:72px;height:72px;border-radius:10px;border:3px solid #111}
+.results p{margin:.65rem 0}
+@media(max-width:760px){
+  .app{display:block}
+  .sidebar{position:sticky;top:0;height:auto;z-index:20;padding:10px;background:var(--sidebar);overflow-x:auto;overflow-y:hidden}
+  .sidebar h2{display:none}
+  .nav{flex-direction:row;width:max-content;gap:6px}
+  .nav button{white-space:nowrap;padding:9px 12px}
+  main{padding:14px}
+  .tile{width:54px;height:54px}
+  .grid{gap:7px}
+  .blindspot-wrap{gap:80px}
+}
 </style>
 </head>
 <body>
+<div class="app">
+<aside class="sidebar">
+  <h2>Oční testy</h2>
+  <nav class="nav">
+    <button class="active" data-tab="intro">Úvod</button>
+    <button data-tab="plates">Barevná čísla</button>
+    <button data-tab="saturation">Řazení sytosti</button>
+    <button data-tab="hues">Řazení odstínů</button>
+    <button data-tab="odd">Odlišné políčko</button>
+    <button data-tab="acuity">Směr písmene C</button>
+    <button data-tab="contrast">Kontrast</button>
+    <button data-tab="peripheral">Periferní vidění</button>
+    <button data-tab="blindspot">Slepá skvrna</button>
+    <button data-tab="amsler">Amslerova mřížka</button>
+    <button data-tab="matching">Barevné párování</button>
+    <button data-tab="memory">Paměť barev</button>
+    <button data-tab="d15">D‑15 styl</button>
+    <button data-tab="summary">Výsledky</button>
+  </nav>
+</aside>
+
+<div class="content">
 <main>
-<h1>Trénink rozlišování barev</h1>
-<p>Náhodně generované úlohy pro rozlišování čísel, sytosti, odstínů a drobných barevných rozdílů.</p>
-
-<div class="tabs">
-<button class="active" data-tab="plates">Barevná čísla</button>
-<button data-tab="saturation">Řazení sytosti</button>
-<button data-tab="hues">Řazení odstínů</button>
-<button data-tab="odd">Odlišné políčko</button>
-<button data-tab="summary">Výsledky</button>
+<section id="intro" class="test active">
+<h1>Oční a barevné testy</h1>
+<p>Náhodně generované úlohy pro trénink rozlišování barev, kontrastu, detailů a periferního vidění.</p>
+<div class="notice"><strong>Důležité:</strong> Nejde o lékařskou diagnostiku. Výsledky ovlivňuje monitor, jas, barevný profil, velikost displeje, vzdálenost od obrazovky a okolní světlo.</div>
+<div class="card">
+<h2>Jak aplikaci používat</h2>
+<p>Na počítači vybírej testy v levém menu. Na mobilu je menu nahoře a lze jej posouvat do stran. Pro opakované porovnávání používej vždy stejné zařízení a podobné světelné podmínky.</p>
 </div>
+</section>
 
-<section id="plates" class="test active card">
-<h2>1. Číslo v barevném šumu</h2>
-<p>Zvol lehčí odpověď pomocí tlačítek, nebo těžší režim, ve kterém číslo napíšeš sama.</p>
+<section id="plates" class="test card">
+<h2>Barevná čísla</h2>
+<p>Zvol odpověď pomocí tlačítek, nebo těžší režim, ve kterém číslo napíšeš.</p>
 <div class="mode-switch">
 <button id="modeButtons" class="choice active">Vybrat z možností</button>
 <button id="modeKeyboard" class="choice">Napsat na klávesnici</button>
 </div>
-
-<p style="text-align:center;margin-bottom:6px"><strong>Obtížnost:</strong></p>
+<p class="center"><strong>Obtížnost:</strong></p>
 <div id="plateDifficulty" class="difficulty">
 <button class="choice active" data-level="easy">Lehká</button>
 <button class="choice" data-level="medium">Střední</button>
 <button class="choice" data-level="hard">Těžká</button>
 </div>
-
 <canvas id="plate" width="430" height="430"></canvas>
 <div id="plateAnswers" class="answers"></div>
 <div id="plateText" class="text-answer">
@@ -84,12 +135,11 @@ small{color:var(--muted)}
 </div>
 <div id="plateStatus" class="status"></div>
 <div class="controls"><button id="newPlate" class="secondary">Nový obrázek</button></div>
-<small>Obrazce jsou generované podle podobného principu jako pseudoizochromatické tabulky, nejde však o standardizovaný Ishiharův test.</small>
 </section>
 
 <section id="saturation" class="test card">
-<h2>2. Seřaď sytost</h2>
-<p>Přetáhni políčka od nejméně sytého vlevo po nejvíce syté vpravo. Každé kolo se automaticky vytvoří z jiné barvy, jasu a rozestupů.</p>
+<h2>Řazení sytosti</h2>
+<p>Přetáhni políčka od nejméně sytého vlevo po nejvíce syté vpravo.</p>
 <div id="satProgress" class="progress"></div>
 <div id="satList" class="sortable"></div>
 <div class="controls">
@@ -102,8 +152,8 @@ small{color:var(--muted)}
 </section>
 
 <section id="hues" class="test card">
-<h2>3. Seřaď odstíny</h2>
-<p>Přetáhni políčka tak, aby tvořila plynulý přechod odstínů zleva doprava. Každá série má náhodný začátek, směr, sytost, jas i velikost barevného kroku.</p>
+<h2>Řazení odstínů</h2>
+<p>Přetáhni políčka tak, aby tvořila plynulý barevný přechod zleva doprava.</p>
 <div id="hueProgress" class="progress"></div>
 <div id="hueList" class="sortable"></div>
 <div class="controls">
@@ -116,375 +166,289 @@ small{color:var(--muted)}
 </section>
 
 <section id="odd" class="test card">
-<h2>4. Najdi odlišné políčko</h2>
-<p>Vyber obtížnost rozdílu a potom klikni na políčko, které má jinou barvu. Nižší procento znamená menší rozdíl a těžší úlohu.</p>
+<h2>Odlišné políčko</h2>
+<p>Vyber obtížnost rozdílu a klikni na políčko s jinou barvou.</p>
 <div id="difficulty" class="difficulty"></div>
 <div id="oddGrid" class="grid"></div>
 <div id="oddStatus" class="status"></div>
 <div class="controls"><button id="newOdd" class="secondary">Nové kolo</button></div>
 </section>
 
+<section id="acuity" class="test card">
+<h2>Směr písmene C</h2>
+<p>Urči, na které straně je mezera. Po správné odpovědi se symbol postupně zmenšuje.</p>
+<div class="eye-board"><div id="landoltC" class="landolt">C</div></div>
+<div class="answers">
+<button data-dir="0">Vpravo</button><button data-dir="90">Dole</button>
+<button data-dir="180">Vlevo</button><button data-dir="270">Nahoře</button>
+</div>
+<div id="acuityStatus" class="status"></div>
+</section>
+
+<section id="contrast" class="test card">
+<h2>Kontrastní citlivost</h2>
+<p>Urči směr pruhů. Po správných odpovědích se kontrast postupně snižuje.</p>
+<div class="contrast-box"><canvas id="contrastCanvas" width="520" height="280"></canvas></div>
+<div class="answers">
+<button data-angle="0">Svislé</button>
+<button data-angle="90">Vodorovné</button>
+<button data-angle="45">Šikmo /</button>
+<button data-angle="-45">Šikmo \</button>
+</div>
+<div id="contrastStatus" class="status"></div>
+</section>
+
+<section id="peripheral" class="test card">
+<h2>Periferní vidění</h2>
+<p>Dívej se stále na křížek uprostřed. Po spuštění krátce blikne tečka. Klikni do oblasti, kde jsi ji zahlédla.</p>
+<div id="peripheralArea" class="peripheral-area">
+<div class="fixation">+</div><div id="flashDot" class="flash-dot"></div>
+</div>
+<div class="controls">
+<button id="startPeripheral">Spustit kolo</button>
+</div>
+<div id="peripheralStatus" class="status"></div>
+</section>
+
+<section id="blindspot" class="test card">
+<h2>Slepá skvrna</h2>
+<p>Zavři levé oko a dívej se pravým okem na křížek. Pomalu měň vzdálenost od monitoru. V určité vzdálenosti by měla tečka zmizet.</p>
+<div class="blindspot-wrap"><span>+</span><span>●</span></div>
+<p class="center"><small>Potom lze test zopakovat obráceně: zavřít pravé oko a sledovat tečku na opačné straně.</small></p>
+</section>
+
+<section id="amsler" class="test card">
+<h2>Amslerova mřížka</h2>
+<p>Dívej se jedním okem na střed. Kliknutím označ políčka, kde se čáry zdají vlnité, rozmazané nebo chybějí.</p>
+<div id="amslerGrid" class="amsler"></div>
+<div class="controls">
+<button id="clearAmsler" class="secondary">Vymazat označení</button>
+</div>
+<div id="amslerStatus" class="status"></div>
+</section>
+
+<section id="matching" class="test card">
+<h2>Barevné párování</h2>
+<p>Vyber políčko, které se nejvíce shoduje s referenční barvou.</p>
+<div id="matchReference" class="color-reference"></div>
+<div id="matchGrid" class="match-grid"></div>
+<div id="matchStatus" class="status"></div>
+</section>
+
+<section id="memory" class="test card">
+<h2>Paměť barev</h2>
+<p>Zapamatuj si barvu. Po chvíli zmizí a vybereš ji z podobných možností.</p>
+<div id="memoryReference" class="color-reference"></div>
+<div class="controls"><button id="startMemory">Spustit</button></div>
+<div id="memoryGrid" class="match-grid hidden"></div>
+<div id="memoryStatus" class="status"></div>
+</section>
+
+<section id="d15" class="test card">
+<h2>D‑15 styl</h2>
+<p>Začni od pevné referenční barvy a seřaď dalších 15 políček podle největší barevné podobnosti.</p>
+<div class="d15-anchor"><div id="d15Anchor"></div></div>
+<div id="d15List" class="sortable"></div>
+<div class="controls">
+<button id="checkD15">Vyhodnotit</button>
+<button id="skipD15" class="secondary">Nová sada</button>
+</div>
+<div id="d15Status" class="status"></div>
+</section>
+
 <section id="summary" class="test card">
 <h2>Výsledky</h2>
-<div id="summaryContent"></div>
+<div id="summaryContent" class="results"></div>
 <div class="controls">
 <button id="exportBtn">Stáhnout výsledky</button>
 <button id="resetBtn" class="secondary">Vynulovat</button>
 </div>
 </section>
 </main>
+</div>
+</div>
 
 <script>
-const defaultState={plates:{ok:0,total:0},saturation:{solved:0,attempts:0},hues:{solved:0,attempts:0},odd:{ok:0,total:0}};
-const state=JSON.parse(localStorage.getItem('colorTrainerState')||JSON.stringify(defaultState));
-const save=()=>{localStorage.setItem('colorTrainerState',JSON.stringify(state));renderSummary()};
+const defaultState={
+ plates:{ok:0,total:0},saturation:{solved:0,attempts:0},hues:{solved:0,attempts:0},
+ odd:{ok:0,total:0},acuity:{ok:0,total:0},contrast:{ok:0,total:0},
+ peripheral:{ok:0,total:0},matching:{ok:0,total:0},memory:{ok:0,total:0},d15:{scores:[]}
+};
+const state=JSON.parse(localStorage.getItem('eyeTrainerState')||JSON.stringify(defaultState));
+const save=()=>{localStorage.setItem('eyeTrainerState',JSON.stringify(state));renderSummary()};
 const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
 const rand=(a,b)=>Math.random()*(b-a)+a;
 const randInt=(a,b)=>Math.floor(rand(a,b+1));
 const hsl=(h,s,l)=>`hsl(${((h%360)+360)%360} ${s}% ${l}%)`;
 
-document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{
- document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('active'));
+document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>{
+ document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));
  document.querySelectorAll('.test').forEach(x=>x.classList.remove('active'));
  b.classList.add('active');document.getElementById(b.dataset.tab).classList.add('active');
  if(b.dataset.tab==='summary')renderSummary();
 });
 
-/* Čísla */
+/* Barevná čísla */
 const canvas=document.getElementById('plate'),ctx=canvas.getContext('2d');
 let plateAnswer=0,plateMode='buttons',plateDifficulty='easy';
-
 const plateSettings={
- easy:{
-   dotCount:810,
-   radius:[5.0,10.0],
-   bgSat:[44,65],
-   fgSat:[68,88],
-   bgLight:[52,67],
-   fgLight:[43,58],
-   hueGap:72,
-   fontSize:216,
-   maskThreshold:116
- },
- medium:{
-   dotCount:930,
-   radius:[4.5,9.5],
-   bgSat:[42,70],
-   fgSat:[55,82],
-   bgLight:[48,68],
-   fgLight:[43,63],
-   hueGap:55,
-   fontSize:212,
-   maskThreshold:125
- },
- hard:{
-   dotCount:1120,
-   radius:[3.5,9],
-   bgSat:[38,75],
-   fgSat:[42,76],
-   bgLight:[43,68],
-   fgLight:[43,67],
-   hueGap:28,
-   fontSize:205,
-   maskThreshold:138
- }
+ easy:{dotCount:810,radius:[5,10],bgSat:[44,65],fgSat:[68,88],bgLight:[52,67],fgLight:[43,58],hueGap:72,fontSize:216,maskThreshold:116},
+ medium:{dotCount:930,radius:[4.5,9.5],bgSat:[42,70],fgSat:[55,82],bgLight:[48,68],fgLight:[43,63],hueGap:55,fontSize:212,maskThreshold:125},
+ hard:{dotCount:1120,radius:[3.5,9],bgSat:[38,75],fgSat:[42,76],bgLight:[43,68],fgLight:[43,67],hueGap:28,fontSize:205,maskThreshold:138}
 };
-
+function circularHueDistance(a,b){const d=Math.abs(a-b)%360;return Math.min(d,360-d)}
+function chooseHuePair(minGap){const bg=randInt(0,359);let fg;do{fg=randInt(0,359)}while(circularHueDistance(bg,fg)<minGap);return[bg,fg]}
 function setPlateMode(mode){
- plateMode=mode;
- document.getElementById('modeButtons').classList.toggle('active',mode==='buttons');
+ plateMode=mode;document.getElementById('modeButtons').classList.toggle('active',mode==='buttons');
  document.getElementById('modeKeyboard').classList.toggle('active',mode==='keyboard');
  document.getElementById('plateAnswers').classList.toggle('hidden',mode!=='buttons');
  document.getElementById('plateText').classList.toggle('active',mode==='keyboard');
 }
-
-document.querySelectorAll('#plateDifficulty button').forEach(button=>{
- button.onclick=()=>{
-   plateDifficulty=button.dataset.level;
-   document.querySelectorAll('#plateDifficulty button').forEach(x=>x.classList.remove('active'));
-   button.classList.add('active');
-   drawPlate();
- };
+document.querySelectorAll('#plateDifficulty button').forEach(button=>button.onclick=()=>{
+ plateDifficulty=button.dataset.level;document.querySelectorAll('#plateDifficulty button').forEach(x=>x.classList.remove('active'));
+ button.classList.add('active');drawPlate();
 });
-
-function circularHueDistance(a,b){
- const d=Math.abs(a-b)%360;
- return Math.min(d,360-d);
-}
-
-function chooseHuePair(minGap){
- const bg=randInt(0,359);
- let fg;
- do{fg=randInt(0,359)}while(circularHueDistance(bg,fg)<minGap);
- return [bg,fg];
-}
-
 function drawPlate(){
  const numbers=[2,3,5,6,7,8,9,12,15,16,26,29,35,42,45,57,73,74,96];
- plateAnswer=numbers[randInt(0,numbers.length-1)];
- const cfg=plateSettings[plateDifficulty];
- const [bgHue,fgHue]=chooseHuePair(cfg.hueGap);
-
+ plateAnswer=numbers[randInt(0,numbers.length-1)];const cfg=plateSettings[plateDifficulty];const[bgHue,fgHue]=chooseHuePair(cfg.hueGap);
  ctx.clearRect(0,0,430,430);
-
- const mask=document.createElement('canvas');
- mask.width=430; mask.height=430;
- const m=mask.getContext('2d');
-
- m.fillStyle='#000';
- m.fillRect(0,0,430,430);
-
- m.fillStyle='#fff';
- m.font=`900 ${cfg.fontSize}px Arial, sans-serif`;
- m.textAlign='center';
- m.textBaseline='middle';
- m.fillText(plateAnswer,215,218);
-
+ const mask=document.createElement('canvas');mask.width=430;mask.height=430;const m=mask.getContext('2d');
+ m.fillStyle='#000';m.fillRect(0,0,430,430);m.fillStyle='#fff';m.font=`900 ${cfg.fontSize}px Arial`;
+ m.textAlign='center';m.textBaseline='middle';m.fillText(plateAnswer,215,218);
  const px=m.getImageData(0,0,430,430).data;
-
- ctx.save();
- ctx.beginPath();
- ctx.arc(215,215,205,0,Math.PI*2);
- ctx.clip();
-
- // Neutral plate background
- ctx.fillStyle='#edf0f3';
- ctx.fillRect(0,0,430,430);
-
+ ctx.save();ctx.beginPath();ctx.arc(215,215,205,0,Math.PI*2);ctx.clip();ctx.fillStyle='#edf0f3';ctx.fillRect(0,0,430,430);
  for(let i=0;i<cfg.dotCount;i++){
-   const x=rand(18,412),y=rand(18,412);
-   if((x-215)**2+(y-215)**2>197**2)continue;
-
-   const r=rand(cfg.radius[0],cfg.radius[1]);
-   const pos=(Math.floor(y)*430+Math.floor(x))*4;
-   const inside=px[pos]>cfg.maskThreshold;
-
-   const hueBase=inside?fgHue:bgHue;
-   const hueJitter=plateDifficulty==='easy'?8:plateDifficulty==='medium'?14:20;
-   const hue=hueBase+rand(-hueJitter,hueJitter);
-
-   const satRange=inside?cfg.fgSat:cfg.bgSat;
-   const lightRange=inside?cfg.fgLight:cfg.bgLight;
-
-   ctx.beginPath();
-   ctx.arc(x,y,r,0,Math.PI*2);
-   ctx.fillStyle=hsl(
-     hue,
-     rand(satRange[0],satRange[1]),
-     rand(lightRange[0],lightRange[1])
-   );
-   ctx.fill();
+  const x=rand(18,412),y=rand(18,412);if((x-215)**2+(y-215)**2>197**2)continue;
+  const pos=(Math.floor(y)*430+Math.floor(x))*4,inside=px[pos]>cfg.maskThreshold,hueBase=inside?fgHue:bgHue;
+  const hs=plateDifficulty==='easy'?8:plateDifficulty==='medium'?14:20;
+  const sr=inside?cfg.fgSat:cfg.bgSat,lr=inside?cfg.fgLight:cfg.bgLight;
+  ctx.beginPath();ctx.arc(x,y,rand(cfg.radius[0],cfg.radius[1]),0,Math.PI*2);
+  ctx.fillStyle=hsl(hueBase+rand(-hs,hs),rand(sr[0],sr[1]),rand(lr[0],lr[1]));ctx.fill();
  }
-
- // In easy mode add a small number of extra foreground dots inside the digit,
- // making broken parts of 2/6/9 less likely.
  if(plateDifficulty==='easy'){
-   for(let i=0;i<115;i++){
-     let x,y,pos,tries=0;
-     do{
-       x=rand(55,375); y=rand(80,350);
-       pos=(Math.floor(y)*430+Math.floor(x))*4;
-       tries++;
-     }while(px[pos]<=cfg.maskThreshold && tries<80);
-
-     if(px[pos]>cfg.maskThreshold){
-       ctx.beginPath();
-       ctx.arc(x,y,rand(4.8,8.2),0,Math.PI*2);
-       ctx.fillStyle=hsl(fgHue+rand(-6,6),rand(76,92),rand(43,54));
-       ctx.fill();
-     }
-   }
+  for(let i=0;i<115;i++){let x,y,pos,t=0;do{x=rand(55,375);y=rand(80,350);pos=(Math.floor(y)*430+Math.floor(x))*4;t++}while(px[pos]<=cfg.maskThreshold&&t<80);
+   if(px[pos]>cfg.maskThreshold){ctx.beginPath();ctx.arc(x,y,rand(4.8,8.2),0,Math.PI*2);ctx.fillStyle=hsl(fgHue+rand(-6,6),rand(76,92),rand(43,54));ctx.fill()}
+  }
  }
-
  ctx.restore();
-
- const wrong=new Set();
- while(wrong.size<3){
-   let v;
-   if(plateAnswer>=10){
-     const tens=Math.floor(plateAnswer/10);
-     v=[tens*10+randInt(0,9),randInt(10,99)][randInt(0,1)];
-   }else{
-     v=randInt(1,9);
-   }
-   if(v!==plateAnswer)wrong.add(v);
- }
-
- const opts=shuffle([plateAnswer,...wrong]);
- const box=document.getElementById('plateAnswers');
- box.innerHTML='';
-
- opts.forEach(v=>{
-   const b=document.createElement('button');
-   b.textContent=v;
-   b.onclick=()=>answerPlate(v);
-   box.appendChild(b);
- });
-
- const none=document.createElement('button');
- none.className='secondary';
- none.textContent='Nic nevidím';
- none.onclick=()=>answerPlate(null);
- box.appendChild(none);
-
- document.getElementById('plateInput').value='';
- document.getElementById('plateStatus').textContent=
-   `Obtížnost: ${plateDifficulty==='easy'?'lehká':plateDifficulty==='medium'?'střední':'těžká'}`;
+ const wrong=new Set();while(wrong.size<3){let v=plateAnswer>=10?[Math.floor(plateAnswer/10)*10+randInt(0,9),randInt(10,99)][randInt(0,1)]:randInt(1,9);if(v!==plateAnswer)wrong.add(v)}
+ const box=document.getElementById('plateAnswers');box.innerHTML='';
+ shuffle([plateAnswer,...wrong]).forEach(v=>{const b=document.createElement('button');b.textContent=v;b.onclick=()=>answerPlate(v);box.appendChild(b)});
+ const none=document.createElement('button');none.className='secondary';none.textContent='Nic nevidím';none.onclick=()=>answerPlate(null);box.appendChild(none);
+ document.getElementById('plateInput').value='';document.getElementById('plateStatus').textContent='';
 }
-
-function answerPlate(v){
- state.plates.total++;
- const ok=Number(v)===plateAnswer;
- if(ok)state.plates.ok++;
-
- document.getElementById('plateStatus').textContent=
-   ok?'Správně.':`Správná odpověď byla ${plateAnswer}.`;
-
- save();
- setTimeout(drawPlate,800);
-}
-
+function answerPlate(v){state.plates.total++;const ok=Number(v)===plateAnswer;if(ok)state.plates.ok++;document.getElementById('plateStatus').textContent=ok?'Správně.':`Správná odpověď byla ${plateAnswer}.`;save();setTimeout(drawPlate,800)}
 document.getElementById('modeButtons').onclick=()=>setPlateMode('buttons');
 document.getElementById('modeKeyboard').onclick=()=>setPlateMode('keyboard');
 document.getElementById('submitPlate').onclick=()=>answerPlate(document.getElementById('plateInput').value);
-document.getElementById('plateInput').addEventListener('keydown',e=>{
- if(e.key==='Enter')answerPlate(e.target.value);
-});
-document.getElementById('noNumber').onclick=()=>answerPlate(null);
-document.getElementById('newPlate').onclick=drawPlate;
+document.getElementById('plateInput').addEventListener('keydown',e=>{if(e.key==='Enter')answerPlate(e.target.value)});
+document.getElementById('noNumber').onclick=()=>answerPlate(null);document.getElementById('newPlate').onclick=drawPlate;
 
-/* Přetahování */
+/* Sort helper */
 function enableSort(container){
- let dragged=null;
- container.querySelectorAll('.tile').forEach(el=>{
-  el.draggable=true;
-  el.addEventListener('dragstart',()=>{dragged=el;el.classList.add('dragging')});
+ let dragged=null;container.querySelectorAll('.tile').forEach(el=>{
+  el.draggable=true;el.addEventListener('dragstart',()=>{dragged=el;el.classList.add('dragging')});
   el.addEventListener('dragend',()=>{el.classList.remove('dragging');dragged=null});
   el.addEventListener('dragover',e=>{e.preventDefault();if(!dragged)return;const r=el.getBoundingClientRect();container.insertBefore(dragged,e.clientX<r.left+r.width/2?el:el.nextSibling)});
-  el.addEventListener('pointerdown',()=>dragged=el);
-  el.addEventListener('pointermove',e=>{if(!dragged||e.pointerType==='mouse')return;const t=document.elementFromPoint(e.clientX,e.clientY)?.closest('.tile');if(t&&t.parentElement===container&&t!==dragged){const r=t.getBoundingClientRect();container.insertBefore(dragged,e.clientX<r.left+r.width/2?t:t.nextSibling)}});
-  el.addEventListener('pointerup',()=>dragged=null);
+  el.addEventListener('pointerdown',()=>dragged=el);el.addEventListener('pointermove',e=>{if(!dragged||e.pointerType==='mouse')return;const t=document.elementFromPoint(e.clientX,e.clientY)?.closest('.tile');if(t&&t.parentElement===container&&t!==dragged){const r=t.getBoundingClientRect();container.insertBefore(dragged,e.clientX<r.left+r.width/2?t:t.nextSibling)}});el.addEventListener('pointerup',()=>dragged=null);
  });
 }
-function exactPositions(container,solution){
- return [...container.children].map((x,i)=>Number(x.dataset.value)===solution[i]);
-}
-function showHint(container,solution){
- exactPositions(container,solution).forEach((ok,i)=>{
-   const tile=container.children[i];tile.innerHTML=ok?`<span class="hint">${i+1}</span>`:'';
- });
-}
+function exactPositions(container,solution){return[...container.children].map((x,i)=>Number(x.dataset.value)===solution[i])}
+function showHint(container,solution){exactPositions(container,solution).forEach((ok,i)=>container.children[i].innerHTML=ok?`<span class="hint">${i+1}</span>`:'')}
 
-/* Sytost: přes 100 unikátních kombinací */
+/* Sytost */
 let satSolution=[],satRound=1;
-function generateSat(){
- const hue=randInt(0,359),light=randInt(42,62),start=randInt(5,18),step=randInt(7,10);
- satSolution=Array.from({length:10},(_,i)=>Math.min(100,start+i*step));
- const box=document.getElementById('satList');box.innerHTML='';
- shuffle(satSolution).forEach(v=>{const d=document.createElement('div');d.className='tile';d.dataset.value=v;d.style.background=hsl(hue,v,light);box.appendChild(d)});
- enableSort(box);
- document.getElementById('satStatus').textContent='';
- document.getElementById('satHint').classList.add('hidden');
- document.getElementById('nextSat').classList.add('hidden');
- document.getElementById('checkSat').classList.remove('hidden');
- document.getElementById('satProgress').textContent=`Série ${satRound} • náhodná varianta`;
+function generateSat(){const hue=randInt(0,359),light=randInt(42,62),start=randInt(5,18),step=randInt(7,10);satSolution=Array.from({length:10},(_,i)=>Math.min(100,start+i*step));
+ const box=document.getElementById('satList');box.innerHTML='';shuffle(satSolution).forEach(v=>{const d=document.createElement('div');d.className='tile';d.dataset.value=v;d.style.background=hsl(hue,v,light);box.appendChild(d)});enableSort(box);
+ document.getElementById('satStatus').textContent='';document.getElementById('satHint').classList.add('hidden');document.getElementById('nextSat').classList.add('hidden');document.getElementById('checkSat').classList.remove('hidden');document.getElementById('satProgress').textContent=`Série ${satRound} • náhodná varianta`;
 }
-document.getElementById('checkSat').onclick=()=>{
- state.saturation.attempts++;
- const correct=exactPositions(document.getElementById('satList'),satSolution).every(Boolean);
- if(correct){
-   state.saturation.solved++;document.getElementById('satStatus').textContent='100 % – správně seřazeno.';
-   document.getElementById('nextSat').classList.remove('hidden');document.getElementById('satHint').classList.add('hidden');document.getElementById('checkSat').classList.add('hidden');
- }else{
-   document.getElementById('satStatus').textContent='Pořadí ještě není celé správně. Můžeš ho upravit nebo použít nápovědu.';
-   document.getElementById('satHint').classList.remove('hidden');
- }
- save();
-};
+document.getElementById('checkSat').onclick=()=>{state.saturation.attempts++;const ok=exactPositions(document.getElementById('satList'),satSolution).every(Boolean);if(ok){state.saturation.solved++;document.getElementById('satStatus').textContent='100 % – správně.';document.getElementById('nextSat').classList.remove('hidden');document.getElementById('checkSat').classList.add('hidden')}else{document.getElementById('satStatus').textContent='Pořadí ještě není správně.';document.getElementById('satHint').classList.remove('hidden')}save()};
 document.getElementById('satHint').onclick=()=>showHint(document.getElementById('satList'),satSolution);
-document.getElementById('skipSat').onclick=()=>{
- satRound++;
- generateSat();
- document.getElementById('satStatus').textContent='Úloha byla přeskočena. Vygenerovala se nová varianta.';
-};
-document.getElementById('nextSat').onclick=()=>{satRound++;generateSat()};
+document.getElementById('skipSat').onclick=()=>{satRound++;generateSat()};document.getElementById('nextSat').onclick=()=>{satRound++;generateSat()};
 
-/* Odstíny: přes 100 unikátních kombinací */
+/* Odstíny */
 let hueSolution=[],hueRound=1;
-function generateHue(){
- const start=randInt(0,359),step=randInt(3,9),direction=Math.random()<.5?1:-1;
- const sat=randInt(48,78),light=randInt(43,62);
- hueSolution=Array.from({length:10},(_,i)=>start+direction*i*step);
- const box=document.getElementById('hueList');box.innerHTML='';
- shuffle(hueSolution).forEach(v=>{const d=document.createElement('div');d.className='tile';d.dataset.value=v;d.style.background=hsl(v,sat,light);box.appendChild(d)});
- enableSort(box);
- document.getElementById('hueStatus').textContent='';
- document.getElementById('hueHint').classList.add('hidden');
- document.getElementById('nextHue').classList.add('hidden');
- document.getElementById('checkHue').classList.remove('hidden');
- document.getElementById('hueProgress').textContent=`Série ${hueRound} • náhodná varianta`;
+function generateHue(){const start=randInt(0,359),step=randInt(3,9),dir=Math.random()<.5?1:-1,sat=randInt(48,78),light=randInt(43,62);hueSolution=Array.from({length:10},(_,i)=>start+dir*i*step);
+ const box=document.getElementById('hueList');box.innerHTML='';shuffle(hueSolution).forEach(v=>{const d=document.createElement('div');d.className='tile';d.dataset.value=v;d.style.background=hsl(v,sat,light);box.appendChild(d)});enableSort(box);
+ document.getElementById('hueStatus').textContent='';document.getElementById('hueHint').classList.add('hidden');document.getElementById('nextHue').classList.add('hidden');document.getElementById('checkHue').classList.remove('hidden');document.getElementById('hueProgress').textContent=`Série ${hueRound} • náhodná varianta`;
 }
-document.getElementById('checkHue').onclick=()=>{
- state.hues.attempts++;
- const correct=exactPositions(document.getElementById('hueList'),hueSolution).every(Boolean);
- if(correct){
-   state.hues.solved++;document.getElementById('hueStatus').textContent='100 % – správně seřazeno.';
-   document.getElementById('nextHue').classList.remove('hidden');document.getElementById('hueHint').classList.add('hidden');document.getElementById('checkHue').classList.add('hidden');
- }else{
-   document.getElementById('hueStatus').textContent='Pořadí ještě není celé správně. Můžeš ho upravit nebo použít nápovědu.';
-   document.getElementById('hueHint').classList.remove('hidden');
- }
- save();
-};
+document.getElementById('checkHue').onclick=()=>{state.hues.attempts++;const ok=exactPositions(document.getElementById('hueList'),hueSolution).every(Boolean);if(ok){state.hues.solved++;document.getElementById('hueStatus').textContent='100 % – správně.';document.getElementById('nextHue').classList.remove('hidden');document.getElementById('checkHue').classList.add('hidden')}else{document.getElementById('hueStatus').textContent='Pořadí ještě není správně.';document.getElementById('hueHint').classList.remove('hidden')}save()};
 document.getElementById('hueHint').onclick=()=>showHint(document.getElementById('hueList'),hueSolution);
-document.getElementById('skipHue').onclick=()=>{
- hueRound++;
- generateHue();
- document.getElementById('hueStatus').textContent='Úloha byla přeskočena. Vygenerovala se nová varianta.';
-};
-document.getElementById('nextHue').onclick=()=>{hueRound++;generateHue()};
+document.getElementById('skipHue').onclick=()=>{hueRound++;generateHue()};document.getElementById('nextHue').onclick=()=>{hueRound++;generateHue()};
 
 /* Odlišné políčko */
-const levels=[3,4,5,6,7,8,9,10,12,13,14,15,16,17,18,19,20];
-let oddLevel=10,oddIndex=0,oddLocked=false;
-const diffBox=document.getElementById('difficulty');
-levels.forEach(v=>{const b=document.createElement('button');b.className='choice'+(v===oddLevel?' active':'');b.textContent=v+' %';b.onclick=()=>{oddLevel=v;[...diffBox.children].forEach(x=>x.classList.remove('active'));b.classList.add('active');newOdd()};diffBox.appendChild(b)});
-function newOdd(){
- oddLocked=false;oddIndex=randInt(0,19);
- const baseH=randInt(0,359),baseS=randInt(45,75),baseL=randInt(43,62);
- const mode=randInt(0,2),grid=document.getElementById('oddGrid');grid.innerHTML='';
- for(let i=0;i<20;i++){
-  let h=baseH,s=baseS,l=baseL;
-  if(i===oddIndex){if(mode===0)h+=oddLevel*1.8;else if(mode===1)s=Math.min(100,s+oddLevel);else l=Math.min(85,l+oddLevel*.65)}
-  const d=document.createElement('button');d.className='swatch';d.style.background=hsl(h,s,l);d.onclick=()=>answerOdd(i);grid.appendChild(d);
- }
+const levels=[3,4,5,6,7,8,9,10,12,13,14,15,16,17,18,19,20];let oddLevel=10,oddIndex=0,oddLocked=false;
+const diffBox=document.getElementById('difficulty');levels.forEach(v=>{const b=document.createElement('button');b.className='choice'+(v===oddLevel?' active':'');b.textContent=v+' %';b.onclick=()=>{oddLevel=v;[...diffBox.children].forEach(x=>x.classList.remove('active'));b.classList.add('active');newOdd()};diffBox.appendChild(b)});
+function newOdd(){oddLocked=false;oddIndex=randInt(0,19);const h=randInt(0,359),s=randInt(45,75),l=randInt(43,62),mode=randInt(0,2),grid=document.getElementById('oddGrid');grid.innerHTML='';
+ for(let i=0;i<20;i++){let hh=h,ss=s,ll=l;if(i===oddIndex){if(mode===0)hh+=oddLevel*1.8;else if(mode===1)ss=Math.min(100,ss+oddLevel);else ll=Math.min(85,ll+oddLevel*.65)}const d=document.createElement('button');d.className='swatch';d.style.background=hsl(hh,ss,ll);d.onclick=()=>answerOdd(i);grid.appendChild(d)}
  document.getElementById('oddStatus').textContent=`Zvolený rozdíl: ${oddLevel} %`;
 }
-function answerOdd(i){
- if(oddLocked)return;oddLocked=true;state.odd.total++;const ok=i===oddIndex;if(ok)state.odd.ok++;
- document.getElementById('oddStatus').textContent=ok?'Správně.':'To nebylo ono. Správné políčko je zvýrazněno.';
- document.getElementById('oddGrid').children[oddIndex].style.outline='4px solid #111';save();setTimeout(newOdd,900);
-}
+function answerOdd(i){if(oddLocked)return;oddLocked=true;state.odd.total++;const ok=i===oddIndex;if(ok)state.odd.ok++;document.getElementById('oddStatus').textContent=ok?'Správně.':'Správné políčko je zvýrazněno.';document.getElementById('oddGrid').children[oddIndex].style.outline='4px solid #111';save();setTimeout(newOdd,900)}
 document.getElementById('newOdd').onclick=newOdd;
 
-/* Výsledky */
+/* Landolt C */
+let acuityDir=0,acuitySize=180;
+function newAcuity(){acuityDir=[0,90,180,270][randInt(0,3)];const c=document.getElementById('landoltC');c.style.transform=`rotate(${acuityDir}deg)`;c.style.fontSize=acuitySize+'px'}
+document.querySelectorAll('#acuity .answers button').forEach(b=>b.onclick=()=>{state.acuity.total++;const ok=Number(b.dataset.dir)===acuityDir;if(ok){state.acuity.ok++;acuitySize=Math.max(28,acuitySize-12)}else acuitySize=Math.min(180,acuitySize+6);document.getElementById('acuityStatus').textContent=ok?'Správně – symbol se zmenšuje.':'Špatně – symbol se mírně zvětší.';save();setTimeout(newAcuity,500)});
+
+/* Contrast */
+const cc=document.getElementById('contrastCanvas'),cx=cc.getContext('2d');let contrastAngle=0,contrastLevel=.38;
+function drawContrast(){contrastAngle=[0,90,45,-45][randInt(0,3)];cx.clearRect(0,0,cc.width,cc.height);cx.save();cx.translate(cc.width/2,cc.height/2);cx.rotate(contrastAngle*Math.PI/180);
+ const period=26;for(let x=-700;x<700;x+=period){cx.fillStyle=`rgba(0,0,0,${contrastLevel})`;cx.fillRect(x,-500,period/2,1000)}cx.restore()}
+document.querySelectorAll('#contrast .answers button').forEach(b=>b.onclick=()=>{state.contrast.total++;const ok=Number(b.dataset.angle)===contrastAngle;if(ok){state.contrast.ok++;contrastLevel=Math.max(.025,contrastLevel*.82)}else contrastLevel=Math.min(.5,contrastLevel*1.15);document.getElementById('contrastStatus').textContent=ok?'Správně – kontrast se snižuje.':'Špatně – kontrast se mírně zvýší.';save();setTimeout(drawContrast,500)});
+
+/* Peripheral */
+let peripheralTarget=null,peripheralReady=false;
+document.getElementById('startPeripheral').onclick=()=>{
+ const area=document.getElementById('peripheralArea'),dot=document.getElementById('flashDot');peripheralReady=false;document.getElementById('peripheralStatus').textContent='Dívej se na křížek…';
+ setTimeout(()=>{const r=area.getBoundingClientRect();const x=randInt(35,Math.max(36,r.width-35)),y=randInt(35,Math.max(36,r.height-35));peripheralTarget={x,y};dot.style.left=(x-14)+'px';dot.style.top=(y-14)+'px';dot.style.display='block';setTimeout(()=>{dot.style.display='none';peripheralReady=true;document.getElementById('peripheralStatus').textContent='Klikni do místa, kde tečka blikla.'},260)},900);
+};
+document.getElementById('peripheralArea').onclick=e=>{if(!peripheralReady||!peripheralTarget)return;const r=e.currentTarget.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top,dist=Math.hypot(x-peripheralTarget.x,y-peripheralTarget.y);state.peripheral.total++;const ok=dist<70;if(ok)state.peripheral.ok++;document.getElementById('peripheralStatus').textContent=ok?`Dobře, odchylka ${Math.round(dist)} px.`:`Mimo, odchylka ${Math.round(dist)} px.`;peripheralReady=false;save()};
+
+/* Amsler */
+const ag=document.getElementById('amslerGrid');for(let i=0;i<400;i++){const b=document.createElement('button');b.onclick=()=>{b.classList.toggle('marked');document.getElementById('amslerStatus').textContent=`Označeno: ${ag.querySelectorAll('.marked').length} políček`};ag.appendChild(b)}
+document.getElementById('clearAmsler').onclick=()=>{ag.querySelectorAll('.marked').forEach(x=>x.classList.remove('marked'));document.getElementById('amslerStatus').textContent=''};
+
+/* Matching */
+let matchAnswer=0;
+function newMatching(){const h=randInt(0,359),s=randInt(45,80),l=randInt(40,65);document.getElementById('matchReference').style.background=hsl(h,s,l);const variants=[];matchAnswer=randInt(0,7);
+ for(let i=0;i<8;i++)variants.push(i===matchAnswer?[h,s,l]:[h+randInt(-12,12),Math.max(20,Math.min(100,s+randInt(-12,12))),Math.max(25,Math.min(80,l+randInt(-10,10)))]);
+ const grid=document.getElementById('matchGrid');grid.innerHTML='';variants.forEach((v,i)=>{const b=document.createElement('button');b.style.background=hsl(v[0],v[1],v[2]);b.onclick=()=>{state.matching.total++;const ok=i===matchAnswer;if(ok)state.matching.ok++;document.getElementById('matchStatus').textContent=ok?'Správně.':'To nebyla přesná shoda.';save();setTimeout(newMatching,650)};grid.appendChild(b)})
+}
+
+/* Memory */
+let memoryAnswer=0,memoryColor=null;
+document.getElementById('startMemory').onclick=()=>{const h=randInt(0,359),s=randInt(45,80),l=randInt(40,65);memoryColor=[h,s,l];const ref=document.getElementById('memoryReference'),grid=document.getElementById('memoryGrid');ref.style.background=hsl(h,s,l);grid.classList.add('hidden');document.getElementById('memoryStatus').textContent='Zapamatuj si barvu…';
+ setTimeout(()=>{ref.style.background='#eee';memoryAnswer=randInt(0,7);grid.innerHTML='';for(let i=0;i<8;i++){const v=i===memoryAnswer?memoryColor:[h+randInt(-16,16),Math.max(20,Math.min(100,s+randInt(-14,14))),Math.max(25,Math.min(80,l+randInt(-12,12)))];const b=document.createElement('button');b.style.background=hsl(v[0],v[1],v[2]);b.onclick=()=>{state.memory.total++;const ok=i===memoryAnswer;if(ok)state.memory.ok++;document.getElementById('memoryStatus').textContent=ok?'Správně.':'To nebyla původní barva.';save();grid.classList.add('hidden')};grid.appendChild(b)}grid.classList.remove('hidden');document.getElementById('memoryStatus').textContent='Vyber původní barvu.'},1800);
+};
+
+/* D15 style */
+let d15Solution=[];
+function newD15(){const start=randInt(0,359),step=randInt(8,14),sat=randInt(50,75),light=randInt(45,62);d15Solution=Array.from({length:15},(_,i)=>start+i*step);document.getElementById('d15Anchor').style.background=hsl(start-step,sat,light);const box=document.getElementById('d15List');box.innerHTML='';shuffle(d15Solution).forEach(v=>{const d=document.createElement('div');d.className='tile';d.dataset.value=v;d.style.background=hsl(v,sat,light);box.appendChild(d)});enableSort(box);document.getElementById('d15Status').textContent=''}
+document.getElementById('checkD15').onclick=()=>{const arr=[...document.getElementById('d15List').children].map(x=>+x.dataset.value),sol=[...d15Solution].sort((a,b)=>a-b);let err=arr.reduce((s,v,i)=>s+Math.abs(v-sol[i]),0);const max=15*(sol.at(-1)-sol[0]);const score=Math.max(0,Math.round(100*(1-err/max)));state.d15.scores.push(score);document.getElementById('d15Status').textContent=`Shoda pořadí: ${score} %`;save()};
+document.getElementById('skipD15').onclick=newD15;
+
+/* Summary */
 function pct(a,b){return b?Math.round(a/b*100):null}
-function renderSummary(){
- const row=(n,v,note)=>`<p><strong>${n}:</strong> ${v===null?'zatím bez výsledku':v+' %'} <small>${note}</small></p>`;
+function avg(a){return a.length?Math.round(a.reduce((x,y)=>x+y,0)/a.length):null}
+function renderSummary(){const row=(n,v,note)=>`<p><strong>${n}:</strong> ${v===null?'bez výsledku':v+' %'} <small>${note}</small></p>`;
  document.getElementById('summaryContent').innerHTML=
  row('Barevná čísla',pct(state.plates.ok,state.plates.total),`(${state.plates.ok}/${state.plates.total})`)+
- row('Sytost – úspěšně dokončené série',pct(state.saturation.solved,state.saturation.attempts),`(${state.saturation.solved} dokončeno, ${state.saturation.attempts} vyhodnocení)`)+
- row('Odstíny – úspěšně dokončené série',pct(state.hues.solved,state.hues.attempts),`(${state.hues.solved} dokončeno, ${state.hues.attempts} vyhodnocení)`)+
- row('Odlišné políčko',pct(state.odd.ok,state.odd.total),`(${state.odd.ok}/${state.odd.total})`);
+ row('Řazení sytosti',pct(state.saturation.solved,state.saturation.attempts),`(${state.saturation.solved}/${state.saturation.attempts})`)+
+ row('Řazení odstínů',pct(state.hues.solved,state.hues.attempts),`(${state.hues.solved}/${state.hues.attempts})`)+
+ row('Odlišné políčko',pct(state.odd.ok,state.odd.total),`(${state.odd.ok}/${state.odd.total})`)+
+ row('Směr C',pct(state.acuity.ok,state.acuity.total),`(${state.acuity.ok}/${state.acuity.total})`)+
+ row('Kontrast',pct(state.contrast.ok,state.contrast.total),`(${state.contrast.ok}/${state.contrast.total})`)+
+ row('Periferní vidění',pct(state.peripheral.ok,state.peripheral.total),`(${state.peripheral.ok}/${state.peripheral.total})`)+
+ row('Barevné párování',pct(state.matching.ok,state.matching.total),`(${state.matching.ok}/${state.matching.total})`)+
+ row('Paměť barev',pct(state.memory.ok,state.memory.total),`(${state.memory.ok}/${state.memory.total})`)+
+ row('D‑15 styl',avg(state.d15.scores),`(${state.d15.scores.length} pokusů)`);
 }
-document.getElementById('exportBtn').onclick=()=>{
- const data={date:new Date().toISOString(),results:state,device:{screen:`${screen.width}x${screen.height}`,userAgent:navigator.userAgent}};
- const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),a=document.createElement('a');
- a.href=URL.createObjectURL(blob);a.download='color-training-results.json';a.click();URL.revokeObjectURL(a.href);
-};
-document.getElementById('resetBtn').onclick=()=>{localStorage.removeItem('colorTrainerState');location.reload()};
+document.getElementById('exportBtn').onclick=()=>{const blob=new Blob([JSON.stringify({date:new Date().toISOString(),results:state},null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='eye-test-results.json';a.click();URL.revokeObjectURL(a.href)};
+document.getElementById('resetBtn').onclick=()=>{localStorage.removeItem('eyeTrainerState');location.reload()};
 
-setPlateMode('buttons');drawPlate();generateSat();generateHue();newOdd();renderSummary();
+/* init */
+setPlateMode('buttons');drawPlate();generateSat();generateHue();newOdd();newAcuity();drawContrast();newMatching();newD15();renderSummary();
 </script>
 </body>
 </html>
