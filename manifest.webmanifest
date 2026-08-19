@@ -1,0 +1,16 @@
+{
+  "name": "Oční a barevné testy",
+  "short_name": "Oční testy",
+  "description": "Oční a barevné testy pro rozlišování barev a periferní vidění.",
+  "lang": "cs",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f4f6f8",
+  "theme_color": "#101826",
+  "orientation": "any",
+  "icons": [
+    {"src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable"},
+    {"src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"}
+  ]
+}
