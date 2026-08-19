@@ -78,6 +78,14 @@ small{color:var(--muted)}
   .blindspot-wrap{gap:80px}
 }
 </style>
+
+  <meta name="theme-color" content="#0f172a">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Oko pro Marcipán">
+  <link rel="apple-touch-icon" href="./icons/icon-192.png">
+  <link rel="manifest" href="./manifest.webmanifest">
 </head>
 <body>
 <div class="app">
@@ -437,6 +445,12 @@ document.getElementById('resetBtn').onclick=()=>{localStorage.removeItem('eyeTra
 
 /* init */
 setPlateMode('buttons');drawPlate();generateSat();generateHue();newOdd();newAcuity();drawContrast();newMatching();newD15();renderSummary();
+</script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js'));
+}
 </script>
 </body>
 </html>
