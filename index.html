@@ -343,6 +343,24 @@ small{color:var(--muted)}
   .install-wrap{display:none !important}
 }
 
+
+/* === SAFE AREA FIX V4 === */
+@media (max-width:760px){
+  body{
+    padding-top:0 !important;
+  }
+
+  .sidebar{
+    top:0 !important;
+    padding-top:calc(10px + env(safe-area-inset-top, 0px)) !important;
+    min-height:calc(62px + env(safe-area-inset-top, 0px)) !important;
+  }
+
+  .sidebar .nav{
+    top:calc(60px + env(safe-area-inset-top, 0px)) !important;
+  }
+}
+
 </style>
 </head>
 <body>
