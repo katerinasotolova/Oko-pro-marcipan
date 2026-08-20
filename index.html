@@ -78,6 +78,9 @@ small{color:var(--muted)}
 .install-btn{width:100%;background:#fff!important;color:#101826!important;font-weight:700;text-align:center!important}
 .install-btn.hidden{display:none!important}
 .pwa-note{display:none;font-size:.78rem;color:#b9c7da;line-height:1.35;margin:8px 6px 0}
+
+.mobile-nav-head{display:none}
+
 @media(max-width:760px){
   .app{display:block}
 
@@ -85,42 +88,76 @@ small{color:var(--muted)}
     position:sticky;
     top:0;
     height:auto;
-    z-index:20;
-    padding:10px 10px 8px;
+    z-index:50;
+    padding:10px;
     background:var(--sidebar);
-    overflow:hidden;
+    overflow:visible;
+    box-shadow:0 6px 18px rgba(0,0,0,.16);
   }
 
   .sidebar h2{display:none}
 
-  .nav{
+  .mobile-nav-head{
     display:flex;
-    flex-direction:row;
     gap:8px;
-    width:100%;
-    max-width:100%;
-    overflow-x:auto;
-    overflow-y:hidden;
-    padding:1px 1px 5px;
-    scroll-snap-type:x proximity;
-    -webkit-overflow-scrolling:touch;
-    scrollbar-width:none;
+    align-items:center;
   }
 
-  .nav::-webkit-scrollbar{display:none}
+  .mobile-menu-toggle,
+  .force-update-btn{
+    border:1px solid rgba(255,255,255,.16);
+    background:rgba(255,255,255,.08);
+    color:#fff;
+    border-radius:12px;
+    padding:10px 13px;
+    font-size:15px;
+    font-weight:700;
+    line-height:1.2;
+    cursor:pointer;
+  }
+
+  .mobile-menu-toggle{
+    flex:1 1 auto;
+    text-align:left;
+  }
+
+  .force-update-btn{
+    flex:0 0 auto;
+  }
+
+  .nav{
+    display:none;
+    position:absolute;
+    left:10px;
+    right:10px;
+    top:58px;
+    width:auto;
+    max-height:min(70vh,520px);
+    overflow-y:auto;
+    overflow-x:hidden;
+    flex-direction:column;
+    gap:6px;
+    padding:9px;
+    background:var(--sidebar);
+    border:1px solid rgba(255,255,255,.12);
+    border-radius:14px;
+    box-shadow:0 16px 35px rgba(0,0,0,.3);
+  }
+
+  .nav.mobile-open{display:flex}
 
   .nav button{
-    flex:0 0 auto;
-    width:auto;
-    min-width:max-content;
+    display:block;
+    width:100%;
+    min-width:0;
     max-width:none;
-    white-space:nowrap;
+    white-space:normal;
     overflow:visible;
     text-overflow:clip;
-    padding:10px 14px;
-    line-height:1.2;
+    text-align:left;
+    padding:11px 13px;
+    line-height:1.25;
     font-size:15px;
-    scroll-snap-align:start;
   }
 
   .install-wrap{display:none}
