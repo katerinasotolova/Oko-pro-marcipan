@@ -240,13 +240,120 @@ small{color:var(--muted)}
   }
 }
 
+
+/* === MOBILE MENU FIX V3 === */
+.mobile-nav-head{display:none}
+
+@media (min-width:761px){
+  .sidebar .nav{
+    display:flex !important;
+  }
+}
+
+@media (max-width:760px){
+  .app{display:block !important}
+
+  .sidebar{
+    display:block !important;
+    position:sticky !important;
+    top:0 !important;
+    z-index:9999 !important;
+    width:100% !important;
+    height:auto !important;
+    min-height:62px !important;
+    padding:10px !important;
+    background:var(--sidebar) !important;
+    overflow:visible !important;
+    box-shadow:0 5px 18px rgba(0,0,0,.18) !important;
+  }
+
+  .sidebar h2{display:none !important}
+
+  .sidebar .mobile-nav-head{
+    display:flex !important;
+    visibility:visible !important;
+    opacity:1 !important;
+    width:100% !important;
+    gap:8px !important;
+    align-items:center !important;
+  }
+
+  .sidebar .mobile-menu-toggle,
+  .sidebar .force-update-btn{
+    display:block !important;
+    visibility:visible !important;
+    opacity:1 !important;
+    min-height:42px !important;
+    border:1px solid rgba(255,255,255,.18) !important;
+    border-radius:12px !important;
+    background:rgba(255,255,255,.09) !important;
+    color:#fff !important;
+    padding:10px 13px !important;
+    font-size:15px !important;
+    font-weight:700 !important;
+    line-height:1.2 !important;
+  }
+
+  .sidebar .mobile-menu-toggle{
+    flex:1 1 auto !important;
+    text-align:left !important;
+  }
+
+  .sidebar .force-update-btn{
+    flex:0 0 auto !important;
+  }
+
+  .sidebar .nav{
+    display:none !important;
+    position:absolute !important;
+    left:10px !important;
+    right:10px !important;
+    top:60px !important;
+    width:auto !important;
+    max-height:70vh !important;
+    overflow-y:auto !important;
+    overflow-x:hidden !important;
+    flex-direction:column !important;
+    gap:6px !important;
+    padding:9px !important;
+    background:var(--sidebar) !important;
+    border:1px solid rgba(255,255,255,.14) !important;
+    border-radius:14px !important;
+    box-shadow:0 16px 35px rgba(0,0,0,.35) !important;
+  }
+
+  .sidebar .nav.mobile-open{
+    display:flex !important;
+  }
+
+  .sidebar .nav button{
+    display:block !important;
+    width:100% !important;
+    min-width:0 !important;
+    max-width:none !important;
+    white-space:normal !important;
+    overflow:visible !important;
+    text-overflow:clip !important;
+    text-align:left !important;
+    padding:11px 13px !important;
+    font-size:15px !important;
+    line-height:1.25 !important;
+  }
+
+  .install-wrap{display:none !important}
+}
+
 </style>
 </head>
 <body>
 <div class="app">
 <aside class="sidebar">
   <h2>Oční testy</h2>
-  <nav class="nav">
+  <div class="mobile-nav-head">
+    <button id="mobileMenuToggle" class="mobile-menu-toggle" type="button" aria-expanded="false">☰ Testy</button>
+    <button id="forceUpdateBtn" class="force-update-btn" type="button">↻ Aktualizovat</button>
+  </div>
+  <nav class="nav" id="mainNav">
     <button class="active" data-tab="plates">Barevná čísla</button>
     <button data-tab="saturation">Řazení sytosti</button>
     <button data-tab="hues">Řazení odstínů</button>
@@ -498,6 +605,78 @@ if(isiOS && !isStandalone) iosInstallHint.style.display='block';
 
 /* init */
 setPlateMode('buttons');drawPlate();generateSat();generateHue();newOdd();
+
+
+// === MOBILE MENU + FORCE UPDATE V3 ===
+const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+const mainNav = document.getElementById('mainNav');
+const forceUpdateBtn = document.getElementById('forceUpdateBtn');
+
+if (mobileMenuToggle && mainNav) {
+  mobileMenuToggle.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const opened = mainNav.classList.toggle('mobile-open');
+    mobileMenuToggle.setAttribute('aria-expanded', opened ? 'true' : 'false');
+    mobileMenuToggle.textContent = opened ? '✕ Zavřít' : '☰ Testy';
+  });
+
+  mainNav.querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (window.matchMedia('(max-width:760px)').matches) {
+        mainNav.classList.remove('mobile-open');
+        mobileMenuToggle.setAttribute('aria-expanded','false');
+        mobileMenuToggle.textContent = '☰ Testy';
+      }
+    });
+  });
+
+  document.addEventListener('click', (e) => {
+    if (
+      window.matchMedia('(max-width:760px)').matches &&
+      mainNav.classList.contains('mobile-open') &&
+      !mainNav.contains(e.target) &&
+      !mobileMenuToggle.contains(e.target)
+    ) {
+      mainNav.classList.remove('mobile-open');
+      mobileMenuToggle.setAttribute('aria-expanded','false');
+      mobileMenuToggle.textContent = '☰ Testy';
+    }
+  });
+}
+
+async function forceAppUpdate() {
+  if (!forceUpdateBtn) return;
+
+  forceUpdateBtn.disabled = true;
+  forceUpdateBtn.textContent = 'Aktualizuji…';
+
+  try {
+    if ('serviceWorker' in navigator) {
+      const regs = await navigator.serviceWorker.getRegistrations();
+      await Promise.all(regs.map(async reg => {
+        try { await reg.update(); } catch (_) {}
+      }));
+    }
+
+    if ('caches' in window) {
+      const keys = await caches.keys();
+      await Promise.all(keys.map(key => caches.delete(key)));
+    }
+
+    const url = new URL(window.location.href);
+    url.searchParams.set('_v', Date.now().toString());
+    window.location.replace(url.toString());
+  } catch (err) {
+    forceUpdateBtn.disabled = false;
+    forceUpdateBtn.textContent = '↻ Aktualizovat';
+    alert('Aktualizace se nepovedla. Zkus aplikaci zavřít a znovu otevřít.');
+  }
+}
+
+if (forceUpdateBtn) {
+  forceUpdateBtn.addEventListener('click', forceAppUpdate);
+}
+
 </script>
 </body>
 </html>
